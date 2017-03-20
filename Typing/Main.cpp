@@ -8,6 +8,8 @@
 
 
 #include <unordered_map>
+#include <map>
+#include <array>
 
 #include "Utils.hpp"
 #include "BMS_Note.hpp"
@@ -23,20 +25,17 @@
 #include "Note.hpp"
 
 
-#include <array>
-
 
 #include "Layout.hpp"
 
 
 
-#include <map>
 
 
 
 void Main()
 {
-	
+
 	Window::Resize(1280, 720);
 
 
@@ -67,81 +66,26 @@ void Main()
 	auto jsonFiles = GetFileFromExtension(L"Assets/test", L"json");
 
 
-	std::unordered_map<String, std::array<Lane, LANE_COUNT>> laneTemplates;
 	std::unordered_map<String, Camera> cameraTemplates;
+
+
+	std::unordered_map<String, Layout> layouts;
 
 
 	for (const auto &path : jsonFiles)
 	{
-		JSONReader json(path);
 
-		const auto name = json[L"name"].to_str();
+		Layout layout(path);
+
+
+		auto name = layout.name();
+
+		layouts[name] = layout;
+
 
 		names.emplace_back(name);
 
-
-		auto json_lanes = json[L"lanes"].getArray();
-
-
-
-
-		// JSON からレーンの位置情報を取得
-		auto _lanes = LaneParser::Parse2(json_lanes);
-
-		auto index = 0;
-
-
-		std::array<Lane, LANE_COUNT> lanes;
-
-		for (auto &lane_framePoint : _lanes)
-		{
-
-
-			auto points = LaneParser::ToPoints(lane_framePoint);
-
-
-			auto data = json[L"lanes"].getArray()[index];
-			
-
-
-
-			Lane _lane(points);
-
-			_lane.w = data[L"w"].getNumber();
-
-			_lane.centerPlaneOpacity = json[L"centerPlane"][L"opacity"].getNumber();
-
-			_lane.color = data[L"color"].isNull() ? Palette::White : Color(data[L"color"].getString());
-
-
-			_lane.fadeOpacity = json[L"fadeOpacity"].getOr<bool>(false) ? 1.0 : 0.0;
-
-
-
-
-			lanes[index] = _lane;
-
-			++index;
-		}
-
-		laneTemplates[name] = lanes;
-
-
-		auto lookAt = json[L"camera"][L"lookAt"].getArray();
-		auto position = json[L"camera"][L"position"];
-
-
-		Camera camera(Vec3(
-			position[0].getNumber(),
-			position[1].getNumber(),
-			position[2].getNumber()
-		), Vec3(
-			lookAt[0].getNumber(), 
-			lookAt[1].getNumber(), 
-			lookAt[2].getNumber()), Vec3(0, 1, 0), 45.0, 0.1);
-
-		cameraTemplates[name] = camera;
-
+		cameraTemplates[name] = layout.camera();
 	}
 
 
@@ -194,14 +138,13 @@ void Main()
 
 	for (auto i : step(LANE_COUNT))
 	{
-		lanes[i] = laneTemplates[activeLaneName][i];
+		lanes[i] = layouts[activeLaneName].lanes()[i];
 	}
 
 
 
 	auto lookAt = cameraTemplates[activeLaneName].lookat;
 	auto position = cameraTemplates[activeLaneName].pos;
-
 
 
 
@@ -240,10 +183,13 @@ void Main()
 
 		for (auto i : step(LANE_COUNT))
 		{
-			lanes[i].transform(laneTemplates[activeLaneName][i]);
+
+		
+
+			lanes[i].transform(layouts[activeLaneName].lanes()[i]);
 		}
 
-		Graphics3D::FreeCamera();
+		// Graphics3D::FreeCamera();
 
 
 
@@ -290,6 +236,16 @@ void Main()
 
 		Cylinder(Vec3(0, 0, 0), 0.05, 10).draw(ColorF(0, 1, 0));
 
+		/*
+
+
+		meshData.vertices[Random(meshData.vertices.size())].position += RandomVec3();
+
+		mesh.fillVertices(meshData.vertices);
+
+		mesh.draw(Palette::Pink);
+
+		*/
 
 	}
 }

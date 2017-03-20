@@ -7,13 +7,6 @@
 namespace LaneParser
 {
 
-	// 0 ~ 1 のキーと位置情報
-	// 例 :
-	// {
-	//     0.0: Vec3,
-	//     1.0: Vec3
-	// }
-	using TimePointMap = std::map<double, Vec3>;
 
 	// 0 ~ LANE_QUALITY のキーと位置情報
 	// 例 :
@@ -61,10 +54,9 @@ namespace LaneParser
 	}
 
 
-	LanePoints ToPoints(const FramePointMap &_laneTimeState)
+	Array<Vec3> ToPoints(const FramePointMap &_laneTimeState)
 	{
-		LanePoints result;
-
+		Array<Vec3> result(LANE_QUALITY);
 
 		auto laneTimeState = _laneTimeState;
 

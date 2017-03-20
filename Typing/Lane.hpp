@@ -11,29 +11,38 @@ struct LaneLine
 #define LERP(key) key = (key * 30 + lane. key) / 31.0
 
 
+#define LANE_VERTEX_SIZE LANE_QUALITY * 2 + 2
+
 
 struct LaneTemplate
 {
 
 	String name;
 
-	std::array<Vec3, LANE_COUNT> points;
+	Array<Vec3> points;
 
+	Array<MeshVertex> vertices;
+
+
+
+	LaneTemplate() :
+		points(LANE_COUNT),
+		vertices(LANE_VERTEX_SIZE)
+	{
+
+	}
 
 };
 
 
 
-using LanePoints = std::array<Vec3, LANE_QUALITY>;
+using LanePoints = Array<Vec3>;
 
 class Lane
 {
 
 
 	LanePoints points;
-
-	Quaternion m_quaternion;
-
 
 
 
@@ -47,7 +56,7 @@ class Lane
 
 		auto length = toVec.length();
 
-		m_quaternion = Quaternion(Vec3::Forward, toVec.normalized());
+		auto m_quaternion = Quaternion(Vec3::Forward, toVec.normalized());
 
 		Plane plane(size, length, m_quaternion);
 
@@ -61,6 +70,8 @@ class Lane
 
 	bool m_drawPoints = false;
 
+	MeshData m_meshData;
+	DynamicMesh m_mesh;
 
 
 public:
@@ -72,6 +83,15 @@ public:
 		: points(points)
 	{
 		m_drawPoints = true;
+
+
+		const uint32 vertexSize = LANE_QUALITY * 2 + 2;
+		const uint32 indexSize = LANE_QUALITY * 3 * 2;
+
+
+		m_meshData = MeshData(vertexSize, indexSize);
+
+
 	}
 
 
@@ -95,11 +115,6 @@ public:
 	{
 
 
-	}
-
-	Quaternion getQuaternion() const
-	{
-		return m_quaternion;
 	}
 
 
