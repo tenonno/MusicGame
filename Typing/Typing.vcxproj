@@ -288,6 +288,7 @@
     <ClInclude Include="BMS_Note.hpp" />
     <ClInclude Include="Lane.hpp" />
     <ClInclude Include="LaneParser.hpp" />
+    <ClInclude Include="LaneTemplate.hpp" />
     <ClInclude Include="Layout.hpp" />
     <ClInclude Include="Note.hpp" />
     <ClInclude Include="Utils.hpp" />

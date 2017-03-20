@@ -28,6 +28,8 @@ double GetBoundLength(const T &points)
 }
 
 
+
+
 Vec3 JSONArrayToVec3(const JSONArray &array)
 {
 
@@ -56,6 +58,12 @@ Vec3 JSONArrayToVec3(const JSONArray &array)
 
 	return Vec3::Zero;
 
+}
+
+
+Vec3 JSONValueToVec3(const JSONValue &value)
+{
+	return JSONArrayToVec3(value.getArray());
 }
 
 

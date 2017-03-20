@@ -33,11 +33,29 @@ namespace LaneParser
 
 			auto size = points.size();
 
+			auto length = 0.0;
+
+			// レーンの長さ
+			for (auto i : step(size - 1))
+			{
+				length += (JSONValueToVec3(points[i + 1]) - JSONValueToVec3(points[i])).length();
+			}
+
+
+			auto beforePos = JSONValueToVec3(points[0]);
+
+			auto pos = 0.0;
+
 			for (auto i : step(size))
 			{
 
 				// 0.0 ~ 1.0
 				double position = 1.0 / size * i;
+
+				pos += (beforePos - JSONValueToVec3(points[i])).length();
+				beforePos = JSONValueToVec3(points[i]);
+
+				position = (pos / length);
 
 				int positionInt = Math::Floor(position * LANE_QUALITY);
 
@@ -60,10 +78,18 @@ namespace LaneParser
 
 		auto laneTimeState = _laneTimeState;
 
+
+
+
+
+
+
 		
 		// size + 1 の位置に最後の要素を複製
 		// nextIterator が範囲外を差さないようにするため
-		laneTimeState[LANE_QUALITY] = (--laneTimeState.end())->second;
+		laneTimeState[LANE_QUALITY - 1] = (--laneTimeState.end())->second;
+
+		laneTimeState[0] = laneTimeState.begin()->second;
 
 		auto currentIterator = laneTimeState.begin();
 		auto nextIterator = ++laneTimeState.begin();
@@ -80,10 +106,12 @@ namespace LaneParser
 			// auto dist = std::distance(currentIterator, nextIterator);
 			auto dist = nextIterator->first - currentIterator->first;
 
+			if (dist == 0) MessageBox::Show(L"w");
+
 			auto toVec = end - begin;
 
 			// 0 ~ 1 ( begin -> end の位置 ) 
-			auto t = (i - currentIterator->first) / (double)dist;
+			auto t = (i - currentIterator->first) / (double)(dist);
 
 				
 			// 座標
@@ -98,10 +126,19 @@ namespace LaneParser
 			{
 				++currentIterator;
 				++nextIterator;
+
+				if (nextIterator == laneTimeState.end())
+				{
+					--nextIterator;
+				}
+
 			}
 
 
 		}
+
+
+
 
 		return result;
 	}

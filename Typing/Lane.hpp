@@ -1,47 +1,6 @@
 #pragma once
 
 
-struct LaneLine
-{
-	Vec3 begin;
-	Vec3 end;
-};
-
-
-#define LERP(key) key = (key * 30 + lane. key) / 31.0
-
-
-#define LANE_VERTEX_SIZE LANE_QUALITY * 2 + 2
-
-
-struct LaneTemplate
-{
-
-	String name;
-
-	Array<Vec3> points;
-
-	Array<MeshVertex> vertices;
-
-	Color backgroundColor;
-
-	// ÉåÅ[ÉìÇÃëÂÇ´Ç≥
-	double size;
-
-	LaneTemplate() :
-		points(LANE_COUNT),
-		vertices(LANE_VERTEX_SIZE)
-	{
-
-
-
-
-		
-
-	}
-
-};
-
 
 
 using LanePoints = Array<Vec3>;
@@ -92,8 +51,8 @@ public:
 		m_drawPoints = true;
 
 
-		const uint32 vertexSize = LANE_QUALITY * 2 + 2;
-		const uint32 indexSize = LANE_QUALITY * 3 * 2;
+		const uint32 vertexSize = LANE_QUALITY * 2;
+		const uint32 indexSize = (LANE_QUALITY - 1) * 6;
 
 		MeshData m_meshData = MeshData(vertexSize, indexSize);
 
@@ -154,14 +113,17 @@ public:
 
 		m_mesh.draw(color);
 
-		/*
 		for (auto vertex : __template.vertices)
 		{
-			Sphere(vertex.position, 0.1).draw();
-		}
-		*/
 
-		// drawPoints();
+
+			Circle(Graphics3D::ToScreenPos(vertex.position).xy(), 6.0)
+				.draw(Palette::Black)
+				.scaled(0.9).draw(Palette::Yellow);
+
+		}
+
+		drawPoints();
 
 	}
 
@@ -179,8 +141,6 @@ public:
 	{
 
 		auto a = m_mesh.fillVertices(_template.vertices);
-
-		if (!a) MessageBox::Show(L"aww");
 
 		__template = _template;
 
@@ -218,6 +178,7 @@ public:
 	{
 
 
+		/*
 		Vec3 sum(0, 0, 0);
 
 		for (auto &point : points)
@@ -250,6 +211,8 @@ public:
 
 		}
 
+		*/
+
 		auto before = points[0];
 
 		for (auto &point : points)
@@ -257,10 +220,11 @@ public:
 
 			// Sphere(point, 0.05).draw(Palette::Pink);
 
+			/*
 			auto lanePlane = createPlane(point, before, w);
 
 
-			lanePlane.draw(color);
+			lanePlane.draw(color);*/
 
 
 			Circle(Graphics3D::ToScreenPos(point).xy(), 6.0)

@@ -4,8 +4,6 @@
 class Layout
 {
 
-	std::array<LaneLine, LANE_COUNT> laneLines;
-
 	String m_name;
 	Camera m_camera;
 
@@ -42,17 +40,69 @@ class Layout
 			auto points = LaneParser::ToPoints(lane_framePoint);
 
 
-			auto data = json[L"lanes"].getArray()[index];
+			auto json_lane = json[L"lanes"].getArray()[index];
+
+
+
+			// 削除予定
+			{
+				Lane _lane(points);
+				_lane.w = json_lane[L"w"].getNumber();
+				_lane.centerPlaneOpacity = json[L"centerPlane"][L"opacity"].getNumber();
+				_lane.color = json_lane[L"color"].isNull() ? Palette::White : Color(json_lane[L"color"].getString());
+				_lane.fadeOpacity = json[L"fadeOpacity"].getOr<bool>(false) ? 1.0 : 0.0;
+				lanes[index] = _lane;
+			}
+
+
+
 
 
 			LaneTemplate _template;
 
 
-			_template.size = data[L"w"].getNumber();
-			_template.backgroundColor = Color(data[L"color"].getOr<String>(L"#fff"));
+			_template.size = json_lane[L"w"].getNumber();
+			_template.backgroundColor = Color(json_lane[L"color"].getOr<String>(L"#fff"));
 
 
-			for (auto i : step(points.size() - 1))
+
+			auto forward = json_lane[L"forward"];
+			if (!forward.isNull()) _template.forward.reset(JSONArrayToVec3(forward.getArray()));
+
+
+			// ノーツ通過点の数
+			auto pointSize = json_lane[L"points"].getArray().size();
+
+			// ノーツが動かないなら
+			// 複数の点からレーンを生成できない
+			if (pointSize == 1)
+			{
+
+				// points を center を中心にした Plane の形に書き換える
+
+				auto center = JSONArrayToVec3(json_lane[L"points"].getArray()[0].getArray());
+
+				auto forward = _template.forward.value_or(Vec3::Forward).normalize();
+
+
+				// 
+				for (auto i : step(LANE_QUALITY))
+				{
+
+					auto vec = forward * (_template.size / (LANE_QUALITY - 1) * i);
+
+					// vec -= forward * _template.size / 2.0;
+
+					points[i] = center - forward * _template.size / 2.0 + vec;
+
+				}
+
+			}
+
+
+
+			// LaneTemplate#vertices を設定する
+			for (auto i : step(LANE_QUALITY - 1))
 			{
 
 				auto point1 = points[i];
@@ -61,8 +111,8 @@ class Layout
 
 				auto toVec = point2 - point1;
 
-		
-			
+
+
 				auto Q = Quaternion(Vec3::Forward, toVec.normalized());
 
 
@@ -70,44 +120,50 @@ class Layout
 				MeshVertex v1, v2, v3, v4;
 
 				v1.position = point1 + Q * Vec3::Left * _template.size / 2;
-
 				v2.position = point1 + Q * Vec3::Right * _template.size / 2;
 
-
 				v3.position = point2 + Q * Vec3::Left * _template.size / 2;
-
 				v4.position = point2 + Q * Vec3::Right * _template.size / 2;
 
 
+				/*
+				v1.position = point1;
+				v2.position = point1;
+				v3.position = point2;
+				v4.position = point2;
+				*/
+
+				// 頂点を調整する（仮）
+				if (i != 0 && i != LANE_QUALITY - 1)
+				{
+
+					v1.position = (_template.vertices[i * 2 + 0].position + v1.position) / 2.0;
+					v2.position = (_template.vertices[i * 2 + 1].position + v2.position) / 2.0;
+
+					/*
+					v1.position = point1 + (v1.position - point1).normalize() * _template.size / 2.0;
+					v2.position = point1 + (v2.position - point1).normalize() * _template.size / 2.0;
+					*/
+				}
+
 				_template.vertices[i * 2 + 0] = v1;
 				_template.vertices[i * 2 + 1] = v2;
+
 				_template.vertices[i * 2 + 2] = v3;
 				_template.vertices[i * 2 + 3] = v4;
+
+
 
 
 			}
 
 
+			// MessageBox::Show(ToString(_template.vertices.size()));
+
 
 			m_laneTemplates.emplace_back(_template);
 
 
-
-			Lane _lane(points);
-
-			_lane.w = data[L"w"].getNumber();
-
-			_lane.centerPlaneOpacity = json[L"centerPlane"][L"opacity"].getNumber();
-
-			_lane.color = data[L"color"].isNull() ? Palette::White : Color(data[L"color"].getString());
-
-
-			_lane.fadeOpacity = json[L"fadeOpacity"].getOr<bool>(false) ? 1.0 : 0.0;
-
-
-
-
-			lanes[index] = _lane;
 
 			++index;
 		}
@@ -164,6 +220,6 @@ public:
 		return m_laneTemplates;
 	}
 
-	
+
 
 };

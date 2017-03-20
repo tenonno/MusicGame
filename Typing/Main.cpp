@@ -4,7 +4,7 @@
 // レーン数
 #define LANE_COUNT 16
 
-#define LANE_QUALITY 24
+#define LANE_QUALITY 50
 
 
 #include <unordered_map>
@@ -16,6 +16,9 @@
 
 
 #include "BMS_Loader.hpp"
+
+#include "LaneTemplate.hpp"
+
 
 #include "Lane.hpp"
 
@@ -240,6 +243,8 @@ void Main()
 
 		Line3D(Vec3(0, 0, 0), Vec3(0, 10, 0)).drawForward(ColorF(0, 1, 0));
 
+
+		Sphere(Vec3(0, 0, 0), 0.01).draw(Palette::Aqua);
 
 		/*
 
