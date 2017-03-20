@@ -26,14 +26,7 @@
 #include <array>
 
 
-
-class ILayout
-{
-
-	std::array<LaneLine, LANE_COUNT> laneLines;
-
-
-};
+#include "Layout.hpp"
 
 
 
