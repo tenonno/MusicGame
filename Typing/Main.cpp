@@ -64,15 +64,14 @@ void Main()
 
 
 	// JSON を読み込む
-	auto jsonList = GetFileFromExtension(L"Assets/test", L"json");
-
+	auto jsonFiles = GetFileFromExtension(L"Assets/test", L"json");
 
 
 	std::unordered_map<String, std::array<Lane, LANE_COUNT>> laneTemplates;
 	std::unordered_map<String, Camera> cameraTemplates;
 
 
-	for (const auto &path : jsonList)
+	for (const auto &path : jsonFiles)
 	{
 		JSONReader json(path);
 
@@ -81,30 +80,28 @@ void Main()
 		names.emplace_back(name);
 
 
-		auto jsonArrayLanes = json[L"lanes"].getArray();
+		auto json_lanes = json[L"lanes"].getArray();
+
+
+
 
 		// JSON からレーンの位置情報を取得
-		auto _lanes = LaneParser::Parse(jsonArrayLanes);
-
-		// レーンの位置情報を正規化
-		auto nLanes = LaneParser::Normalize(_lanes);
-
+		auto _lanes = LaneParser::Parse2(json_lanes);
 
 		auto index = 0;
 
 
 		std::array<Lane, LANE_COUNT> lanes;
 
-		for (auto &lane : nLanes)
+		for (auto &lane_framePoint : _lanes)
 		{
 
 
-			auto points = LaneParser::ToPoints(lane);
+			auto points = LaneParser::ToPoints(lane_framePoint);
 
 
 			auto data = json[L"lanes"].getArray()[index];
 			
-
 
 
 

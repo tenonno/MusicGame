@@ -12,6 +12,17 @@ struct LaneLine
 
 
 
+struct LaneTemplate
+{
+
+	String name;
+
+	std::array<Vec3, LANE_COUNT> points;
+
+
+};
+
+
 
 using LanePoints = std::array<Vec3, LANE_QUALITY>;
 

@@ -28,7 +28,35 @@ double GetBoundLength(const T &points)
 }
 
 
+Vec3 JSONArrayToVec3(const JSONArray &array)
+{
 
+	if (array.size() == 3)
+	{
+
+		return Vec3(
+			array[0].getNumber(),
+			array[1].getNumber(),
+			array[2].getNumber()
+		);
+
+	}
+
+	if (array.size() == 2)
+	{
+
+		return Vec3(
+			array[0].getNumber(),
+			0.0,
+			array[1].getNumber()
+		);
+
+	}
+
+
+	return Vec3::Zero;
+
+}
 
 
 // 拡張子からファイル一覧を取得する

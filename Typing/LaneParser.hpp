@@ -7,96 +7,61 @@
 namespace LaneParser
 {
 
-	using R = std::map<double, Vec3>;
+	// 0 ~ 1 のキーと位置情報
+	// 例 :
+	// {
+	//     0.0: Vec3,
+	//     1.0: Vec3
+	// }
+	using TimePointMap = std::map<double, Vec3>;
 
-	using R2 = std::map<int, Vec3>;
+	// 0 ~ LANE_QUALITY のキーと位置情報
+	// 例 :
+	// {
+	//     1: Vec3,
+	//     50: Vec3
+	// }
+	using FramePointMap = std::map<int, Vec3>;
 
-	Array<R> Parse(const JSONArray &lanes)
+
+	std::array<FramePointMap, LANE_COUNT> Parse2(const JSONArray &lanes)
 	{
 
-		return Map<R>(lanes, [](JSONValue _jsonValue) {
+		std::array<FramePointMap, LANE_COUNT> map;
 
-			auto jsonValue = _jsonValue[L"points"];
-
-			R mmp;
-
-
-			auto obj = jsonValue.getObject();
-
-
-			for (auto &pair : obj)
-			{
-
-				// コメントは無視
-				if (pair.first == L"#") continue;
-
-				auto position = FromString<double>(pair.first);
-
-				auto pos3D = pair.second.getArray();
-
-				Vec3 pos;
-
-				if (pos3D.size() == 2)
-				{
-					pos = Vec3(pos3D[0].getNumber(), 0, pos3D[1].getNumber());
-				}
-
-				if (pos3D.size() == 3)
-				{
-					pos = Vec3(pos3D[0].getNumber(), pos3D[1].getNumber(), pos3D[2].getNumber());
-				}
-
-
-
-				mmp[Clamp(position, 0.0, 1.0)] = pos;
-
-			}
-
-
-			return mmp;
-
-		});
-
-
-
-	}
-
-
-	// レーンの位置情報 0 ~ 1 を 0 ~ LANE_QUALITY に正規化する
-	Array<R2> Normalize(const Array<R> &lanes)
-	{
-		Array<R2> result;
-
-		result.reserve(lanes.size());
-
+		int index = 0;
 
 		for (auto &lane : lanes)
 		{
 
-			R2 r2;
+			FramePointMap timePointMap;
 
+			auto points = lane[L"points"].getArray();
 
-			for (auto &value : lane)
+			auto size = points.size();
+
+			for (auto i : step(size))
 			{
 
-				
-				auto pos = Math::Floor(value.first * LANE_QUALITY);
+				// 0.0 ~ 1.0
+				double position = 1.0 / size * i;
 
+				int positionInt = Math::Floor(position * LANE_QUALITY);
 
-				r2[(int)pos] = value.second;
+				timePointMap[positionInt] = JSONArrayToVec3(points[i].getArray());
 
 			}
 
-			result.emplace_back(r2);
-
+			map[index++] = timePointMap;
+			
 		}
 
-		return result;
+		return map;
 
 	}
 
 
-	LanePoints ToPoints(const R2 &_laneTimeState)
+	LanePoints ToPoints(const FramePointMap &_laneTimeState)
 	{
 		LanePoints result;
 
