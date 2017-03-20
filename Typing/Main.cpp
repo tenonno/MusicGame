@@ -66,8 +66,6 @@ void Main()
 	auto jsonFiles = GetFileFromExtension(L"Assets/test", L"json");
 
 
-	std::unordered_map<String, Camera> cameraTemplates;
-
 
 	std::unordered_map<String, Layout> layouts;
 
@@ -85,8 +83,9 @@ void Main()
 
 		names.emplace_back(name);
 
-		cameraTemplates[name] = layout.camera();
 	}
+
+
 
 
 	// ラジオボタン
@@ -142,17 +141,19 @@ void Main()
 	}
 
 
+	
 
-	auto lookAt = cameraTemplates[activeLaneName].lookat;
-	auto position = cameraTemplates[activeLaneName].pos;
+	auto lookAt = layouts[activeLaneName].camera().lookat;
+	auto position = layouts[activeLaneName].camera().pos;
 
 
+
+	Graphics3D::SetRasterizerState(RasterizerState(FillMode::Solid, CullMode::None));
 
 	while (System::Update())
 	{
 
 		ClearPrint();
-
 
 
 		auto radio = gui.radioButton(L"rb1");
@@ -168,10 +169,12 @@ void Main()
 
 		}
 
+		const auto layout = layouts[activeLaneName];
 
 
-		position = (position * 30 + cameraTemplates[activeLaneName].pos) / 31.0;
-		lookAt = (lookAt * 30 + cameraTemplates[activeLaneName].lookat) / 31.0;
+
+		position = (position * 30 + layout.camera().pos) / 31.0;
+		lookAt = (lookAt * 30 + layout.camera().lookat) / 31.0;
 
 
 		Camera camera(position, lookAt, Vec3::Up, 45.0, 0.1);
@@ -180,17 +183,16 @@ void Main()
 
 
 
-
 		for (auto i : step(LANE_COUNT))
 		{
-
-		
-
 			lanes[i].transform(layouts[activeLaneName].lanes()[i]);
+
+
+			lanes[i].transform(layouts[activeLaneName].lanes2()[i]);
+
 		}
 
 		// Graphics3D::FreeCamera();
-
 
 
 		Println(L"Sec: ", sound.streamPosSec());
@@ -234,7 +236,10 @@ void Main()
 
 		}
 
-		Cylinder(Vec3(0, 0, 0), 0.05, 10).draw(ColorF(0, 1, 0));
+
+
+		Line3D(Vec3(0, 0, 0), Vec3(0, 10, 0)).drawForward(ColorF(0, 1, 0));
+
 
 		/*
 

@@ -23,12 +23,20 @@ struct LaneTemplate
 
 	Array<MeshVertex> vertices;
 
+	Color backgroundColor;
 
+	// レーンの大きさ
+	double size;
 
 	LaneTemplate() :
 		points(LANE_COUNT),
 		vertices(LANE_VERTEX_SIZE)
 	{
+
+
+
+
+		
 
 	}
 
@@ -41,9 +49,7 @@ using LanePoints = Array<Vec3>;
 class Lane
 {
 
-
 	LanePoints points;
-
 
 
 	Plane createPlane(const Vec3 &begin, const Vec3 &end, const double size)
@@ -70,11 +76,12 @@ class Lane
 
 	bool m_drawPoints = false;
 
-	MeshData m_meshData;
 	DynamicMesh m_mesh;
 
+	LaneTemplate __template;
 
 public:
+
 	Lane()
 	{}
 
@@ -88,8 +95,31 @@ public:
 		const uint32 vertexSize = LANE_QUALITY * 2 + 2;
 		const uint32 indexSize = LANE_QUALITY * 3 * 2;
 
+		MeshData m_meshData = MeshData(vertexSize, indexSize);
 
-		m_meshData = MeshData(vertexSize, indexSize);
+
+		for (auto i : step(vertexSize))
+		{
+
+			m_meshData.vertices[i].position = RandomVec3() * 10.0;
+
+		}
+
+
+		for (auto i : step(LANE_QUALITY - 1))
+		{
+
+			m_meshData.indices[i * 6 + 0] = i * 2 + 0;
+			m_meshData.indices[i * 6 + 1] = i * 2 + 1;
+			m_meshData.indices[i * 6 + 2] = i * 2 + 2;
+
+			m_meshData.indices[i * 6 + 3] = i * 2 + 1;
+			m_meshData.indices[i * 6 + 4] = i * 2 + 2;
+			m_meshData.indices[i * 6 + 5] = i * 2 + 3;
+
+		}
+
+		m_mesh = DynamicMesh(m_meshData);
 
 
 	}
@@ -122,8 +152,16 @@ public:
 	void draw()
 	{
 
+		m_mesh.draw(color);
 
-		drawPoints();
+		/*
+		for (auto vertex : __template.vertices)
+		{
+			Sphere(vertex.position, 0.1).draw();
+		}
+		*/
+
+		// drawPoints();
 
 	}
 
@@ -135,6 +173,17 @@ public:
 	LanePoints getPoints() const
 	{
 		return points;
+	}
+
+	void transform(const LaneTemplate &_template)
+	{
+
+		auto a = m_mesh.fillVertices(_template.vertices);
+
+		if (!a) MessageBox::Show(L"aww");
+
+		__template = _template;
+
 	}
 
 
@@ -181,7 +230,6 @@ public:
 
 
 
-
 		// jubeat 対策
 		// レーンのサイズが一定以下になったら代わりの Plane を描画する
 		{
@@ -211,20 +259,19 @@ public:
 
 			auto lanePlane = createPlane(point, before, w);
 
-			lanePlane.scaled(1.1).draw(Palette::Black);
 
 			lanePlane.draw(color);
 
 
-
-
+			Circle(Graphics3D::ToScreenPos(point).xy(), 6.0)
+				.draw(Palette::Black)
+				.scaled(0.9).draw(Palette::White);
 
 
 			before = point;
 
 			if (m_drawPoints)
 			{
-				const auto v = Graphics3D::ToScreenPos(point);
 				// FontAsset(L"font1").drawAt(Format(point), Vec2(v.x, v.y));
 			}
 

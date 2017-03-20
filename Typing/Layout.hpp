@@ -10,6 +10,8 @@ class Layout
 	Camera m_camera;
 
 	Array<Lane> m_lanes;
+	// m_lanes ‚ð m_laneTemplates ‚É’uŠ·—\’è
+	Array<LaneTemplate> m_laneTemplates;
 
 	void load(const FilePath &path)
 	{
@@ -22,7 +24,6 @@ class Layout
 
 
 		auto json_lanes = json[L"lanes"].getArray();
-
 
 
 
@@ -43,6 +44,52 @@ class Layout
 
 			auto data = json[L"lanes"].getArray()[index];
 
+
+			LaneTemplate _template;
+
+
+			_template.size = data[L"w"].getNumber();
+			_template.backgroundColor = Color(data[L"color"].getOr<String>(L"#fff"));
+
+
+			for (auto i : step(points.size() - 1))
+			{
+
+				auto point1 = points[i];
+				auto point2 = points[i + 1];
+
+
+				auto toVec = point2 - point1;
+
+		
+			
+				auto Q = Quaternion(Vec3::Forward, toVec.normalized());
+
+
+
+				MeshVertex v1, v2, v3, v4;
+
+				v1.position = point1 + Q * Vec3::Left * _template.size / 2;
+
+				v2.position = point1 + Q * Vec3::Right * _template.size / 2;
+
+
+				v3.position = point2 + Q * Vec3::Left * _template.size / 2;
+
+				v4.position = point2 + Q * Vec3::Right * _template.size / 2;
+
+
+				_template.vertices[i * 2 + 0] = v1;
+				_template.vertices[i * 2 + 1] = v2;
+				_template.vertices[i * 2 + 2] = v3;
+				_template.vertices[i * 2 + 3] = v4;
+
+
+			}
+
+
+
+			m_laneTemplates.emplace_back(_template);
 
 
 
@@ -111,5 +158,12 @@ public:
 	{
 		return m_lanes;
 	}
+
+	Array<LaneTemplate> lanes2() const
+	{
+		return m_laneTemplates;
+	}
+
+	
 
 };
