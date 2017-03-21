@@ -16,7 +16,9 @@
       "index": [ 0, 2, 4, 6, 8, 10, 12, 14 ],
       "w": 1,
 
-      "noteColor": "#f00",
+      "backgroundColor": "#333",
+
+      "noteColor": "#f4392c",
       "noteSize": 0.5,
 
       "points": [
@@ -31,7 +33,8 @@
       "w": 1,
 
 
-      "noteColor": "#00f",
+      "backgroundColor": "#333",
+      "noteColor": "#79ddcf",
       "noteSize": 0.5,
 
       "points": [

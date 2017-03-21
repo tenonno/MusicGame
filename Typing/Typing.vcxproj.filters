@@ -345,6 +345,9 @@
     <None Include="Assets\test\maimai.json">
       <Filter>リソース ファイル\Assets</Filter>
     </None>
+    <None Include="Assets\test\ref.json">
+      <Filter>リソース ファイル\Assets</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Engine\dll(x64)\libmpg123\COPYING.txt">

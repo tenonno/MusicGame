@@ -139,7 +139,7 @@ void Main()
 
 
 
-	sound.setVolume(0.0);
+	sound.setVolume(1.0);
 
 	sound.play();
 
@@ -185,8 +185,11 @@ void Main()
 		lanes[i] = layouts[activeLaneName].lanes()[i];
 	}
 
+	int32 blur = 60;
 
+	const Texture background(Image(L"Assets/_title.bmp").gaussianBlurred(blur, blur));
 
+	
 
 	auto lookAt = layouts[activeLaneName].camera().lookat;
 	auto position = layouts[activeLaneName].camera().pos;
@@ -205,6 +208,9 @@ void Main()
 
 		L::Update();
 
+		background.resize(Window::Size()).draw();
+
+		Graphics::Render2D();
 
 		auto radio = gui.radioButton(L"rb1");
 

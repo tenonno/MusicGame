@@ -17,7 +17,9 @@
       "index": [ 0 ],
       "w": 0.2,
 
-      "noteColor": "#f00",
+      "backgroundColor": "#c66",
+      "backgroundOpacity": 0.2,
+      "noteColor": "#26c",
 
       "points": [
         [ 0.000, -1.000 ],
@@ -59,8 +61,10 @@
       "index": [ 8 ],
       "w": 0.2,
 
+      "backgroundColor": "#c66",
+      "backgroundOpacity": 0.2,
 
-      "noteColor": "#00f",
+      "noteColor": "#26c",
 
       "points": [
         [ 0.000, 1.000 ],
@@ -103,7 +107,9 @@
       "index": [ 1 ],
       "w": 0.2,
 
-      "noteColor": "#00f",
+      "noteColor": "#c26",
+      "backgroundColor": "#000",
+      "backgroundOpacity": 0.2,
 
       "points": [
         [ 0, 0 ],
@@ -112,10 +118,11 @@
     },
     {
       "#": "R-1",
-      "index": [ 2  ],
+      "index": [ 2 ],
       "w": 0.2,
-
-      "noteColor": "#00f",
+      "noteColor": "#c26",
+      "backgroundColor": "#000",
+      "backgroundOpacity":  0.2,
 
       "points": [
         [ 0, 0 ],
@@ -127,8 +134,10 @@
       "index": [ 3, 9 ],
       "w": 0.2,
 
-      "noteColor": "#00f",
+      "noteColor": "#c26",
 
+      "backgroundColor": "#000",
+      "backgroundOpacity": 0.2,
       "points": [
         [ 0, 0 ],
         [ 0.924, -0.383 ]
@@ -140,8 +149,10 @@
       "index": [ 4, 10 ],
       "w": 0.2,
 
-      "noteColor": "#00f",
+      "noteColor": "#c26",
 
+      "backgroundColor": "#000",
+      "backgroundOpacity": 0.2,
       "points": [
         [ 0, 0 ],
         [ 0.383, -0.924 ]
@@ -153,8 +164,10 @@
       "index": [ 5, 11 ],
       "w": 0.2,
 
-      "noteColor": "#00f",
+      "noteColor": "#c26",
 
+      "backgroundColor": "#000",
+      "backgroundOpacity": 0.2,
       "points": [
         [ 0, 0 ],
         [ -0.383, -0.924 ]
@@ -164,8 +177,9 @@
       "#": "R-5",
       "index": [ 6, 12 ],
       "w": 0.2,
-
-      "noteColor": "#00f",
+      "noteColor": "#c26",
+      "backgroundColor": "#000",
+      "backgroundOpacity": 0.2,
 
       "points": [
         [ 0, 0 ],
@@ -177,8 +191,10 @@
       "index": [ 7, 13 ],
       "w": 0.2,
 
-      "noteColor": "#00f",
+      "noteColor": "#c26",
 
+      "backgroundColor": "#000",
+      "backgroundOpacity": 0.2,
       "points": [
         [ 0, 0 ],
         [ -0.924, 0.383 ]
@@ -189,7 +205,10 @@
       "index": [ 15, 14 ],
       "w": 0.2,
 
-      "noteColor": "#00f",
+      "noteColor": "#c26",
+
+      "backgroundColor": "#000",
+      "backgroundOpacity":  0.2,
 
       "points": [
         [ 0, 0 ],
