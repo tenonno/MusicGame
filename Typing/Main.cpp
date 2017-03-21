@@ -96,7 +96,7 @@ void Main()
 
 
 	GUI gui(GUIStyle::Default);
-	gui.setTitle(L"タイトル");
+	gui.setTitle(L"設定");
 
 
 
@@ -137,6 +137,7 @@ void Main()
 	gui.add(L"rb1", GUIRadioButton::Create(names, 0, true));
 
 
+	gui.add(L"ts1", GUIToggleSwitch::Create(L"FreeCamera: OFF", L"FreeCamera: ON", false));
 
 
 	sound.setVolume(1.0);
@@ -237,6 +238,10 @@ void Main()
 		Graphics3D::SetCamera(camera);
 
 
+		if (gui.toggleSwitch(L"ts1").isRight)
+		{
+			Graphics3D::FreeCamera();
+		}
 
 		for (auto i : step(LANE_COUNT))
 		{
