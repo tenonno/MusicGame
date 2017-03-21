@@ -184,6 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\test\iidx.json" />
+    <None Include="Assets\test\maimai.json" />
     <None Include="Assets\test\sdvx.json" />
     <None Include="Assets\test\jubeat.json" />
     <None Include="Assets\test\taiko.json" />

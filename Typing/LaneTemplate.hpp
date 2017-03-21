@@ -16,13 +16,18 @@ struct LaneTemplate
 
 	Array<MeshVertex> vertices;
 
-	Color backgroundColor;
+	ColorF backgroundColor;
+	ColorF noteColor;
+
+	double noteSize;
 
 	// ƒŒ[ƒ“‚Ì‘å‚«‚³
 	double size;
 
 	// ƒŒ[ƒ“‚ÌŒü‚«
 	Optional<Vec3> forward;
+
+	double noteTime;
 
 	LaneTemplate() :
 		points(LANE_COUNT),

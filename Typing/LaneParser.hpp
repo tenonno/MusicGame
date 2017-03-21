@@ -20,6 +20,8 @@ namespace LaneParser
 	std::array<FramePointMap, LANE_COUNT> Parse2(const JSONArray &lanes)
 	{
 
+
+
 		std::array<FramePointMap, LANE_COUNT> map;
 
 		int index = 0;
@@ -30,6 +32,9 @@ namespace LaneParser
 			FramePointMap timePointMap;
 
 			auto points = lane[L"points"].getArray();
+
+			std::reverse(points.begin(), points.end());
+
 
 			auto size = points.size();
 
@@ -81,15 +86,11 @@ namespace LaneParser
 
 
 
-
-
-
 		
-		// size + 1 の位置に最後の要素を複製
-		// nextIterator が範囲外を差さないようにするため
+		// 最初と最後に必ず情報があるようにする
+		laneTimeState[0] = laneTimeState.begin()->second;
 		laneTimeState[LANE_QUALITY - 1] = (--laneTimeState.end())->second;
 
-		laneTimeState[0] = laneTimeState.begin()->second;
 
 		auto currentIterator = laneTimeState.begin();
 		auto nextIterator = ++laneTimeState.begin();

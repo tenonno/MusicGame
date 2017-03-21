@@ -11,33 +11,11 @@ class Lane
 	LanePoints points;
 
 
-	Plane createPlane(const Vec3 &begin, const Vec3 &end, const double size)
-	{
-
-
-		// begin -> end のベクトル
-		auto toVec = end - begin;
-
-
-		auto length = toVec.length();
-
-		auto m_quaternion = Quaternion(Vec3::Forward, toVec.normalized());
-
-		Plane plane(size, length, m_quaternion);
-
-
-		plane.setPos(begin + toVec / 2.0);
-
-
-		return plane;
-
-	}
-
-	bool m_drawPoints = false;
-
 	DynamicMesh m_mesh;
 
-	LaneTemplate __template;
+
+	Array<MeshVertex> m_vertices;
+
 
 public:
 
@@ -48,7 +26,8 @@ public:
 	Lane(const LanePoints &points)
 		: points(points)
 	{
-		m_drawPoints = true;
+
+		m_vertices.resize(LANE_VERTEX_SIZE);
 
 
 		const uint32 vertexSize = LANE_QUALITY * 2;
@@ -89,15 +68,18 @@ public:
 	double aTime = 1.0;
 
 	double w;
-	Color color = Palette::White;
+	ColorF color = Palette::White;
 
 	double centerPlaneOpacity = 0.0;
 
-
+	double noteSize;
 
 	// ノーツの透明度を位置に合わせて変化させるか
 	double fadeOpacity = 0.0;
 
+	ColorF noteColor;
+
+	double noteTime = 1.0;
 
 
 	void update()
@@ -108,24 +90,7 @@ public:
 
 
 
-	void draw()
-	{
-
-		m_mesh.draw(color);
-
-		for (auto vertex : __template.vertices)
-		{
-
-
-			Circle(Graphics3D::ToScreenPos(vertex.position).xy(), 6.0)
-				.draw(Palette::Black)
-				.scaled(0.9).draw(Palette::Yellow);
-
-		}
-
-		drawPoints();
-
-	}
+	
 
 	Vec3 point(int index) const
 	{
@@ -140,9 +105,34 @@ public:
 	void transform(const LaneTemplate &_template)
 	{
 
-		auto a = m_mesh.fillVertices(_template.vertices);
+		for (auto i : step(_template.vertices.size()))
+		{
 
-		__template = _template;
+			m_vertices[i].position = L::L(m_vertices[i].position, _template.vertices[i].position);
+
+		}
+
+
+		noteColor.r = L::L(noteColor.r, _template.noteColor.r);
+		noteColor.g = L::L(noteColor.g, _template.noteColor.g);
+		noteColor.b = L::L(noteColor.b, _template.noteColor.b);
+		noteColor.a = L::L(noteColor.a, _template.noteColor.a);
+
+
+		noteTime = L::L(noteTime, _template.noteTime);
+
+
+		noteSize = L::L(noteSize, _template.noteSize);
+
+
+		color.r = L::L(color.r, _template.backgroundColor.r);
+		color.g = L::L(color.g, _template.backgroundColor.g);
+		color.b = L::L(color.b, _template.backgroundColor.b);
+		color.a = L::L(color.a, _template.backgroundColor.a);
+
+
+
+		m_mesh.fillVertices(m_vertices);// _template.vertices);
 
 	}
 
@@ -154,9 +144,9 @@ public:
 
 
 
-		color.r = (color.r * 30 + lane.color.r) / 31.0;
-		color.g = (color.g * 30 + lane.color.g) / 31.0;
-		color.b = (color.b * 30 + lane.color.b) / 31.0;
+
+
+
 
 		LERP(centerPlaneOpacity);
 
@@ -167,10 +157,19 @@ public:
 		for (auto i : step(LANE_QUALITY))
 		{
 
-			points[i] = (points[i] * 30 + lane.point(i)) / 31.0;
+			points[i] = L::L(points[i], lane.point(i));
 
 		}
 
+
+	}
+
+	void draw()
+	{
+
+		m_mesh.drawForward(color);
+
+		// drawPoints();
 
 	}
 
@@ -178,53 +177,25 @@ public:
 	{
 
 
-		/*
-		Vec3 sum(0, 0, 0);
-
-		for (auto &point : points)
-		{
-			sum += point;
-		}
-
-		auto center = sum / LANE_QUALITY;
-
-
-
-
-		// jubeat 対策
-		// レーンのサイズが一定以下になったら代わりの Plane を描画する
+		for (auto vertex : m_vertices)
 		{
 
-			auto length = GetBoundLength(points);
 
-			if (length < 1.0)
-			{
-
-				ColorF color2 = (ColorF)color;
-
-				color2.a = 0.5;
-
-				Plane(center, w, w).drawForward(color2);
-
-
-			}
+			Circle(Graphics3D::ToScreenPos(vertex.position).xy(), 6.0)
+				.draw(Palette::Black)
+				.scaled(0.9).draw(Palette::Yellow);
 
 		}
 
-		*/
 
-		auto before = points[0];
+
 
 		for (auto &point : points)
 		{
 
 			// Sphere(point, 0.05).draw(Palette::Pink);
 
-			/*
-			auto lanePlane = createPlane(point, before, w);
 
-
-			lanePlane.draw(color);*/
 
 
 			Circle(Graphics3D::ToScreenPos(point).xy(), 6.0)
@@ -232,42 +203,11 @@ public:
 				.scaled(0.9).draw(Palette::White);
 
 
-			before = point;
-
-			if (m_drawPoints)
-			{
-				// FontAsset(L"font1").drawAt(Format(point), Vec2(v.x, v.y));
-			}
-
-
 
 
 		}
 
-		/*
 
-		if (centerPlaneOpacity > 0.0)
-		{
-
-			ColorF color2 = (ColorF)color;
-
-			color2.a = centerPlaneOpacity;
-
-			Plane(center, w, w).drawForward(color2);
-
-		}
-		*/
-
-
-		/*
-
-		Array<Particle> particles;
-
-		particles.emplace_back(center, 1, ColorF(1.0, 0.0, 0.0, 0.8));
-
-		Graphics3D::DrawParticlesForward(particles);
-
-		*/
 
 	}
 

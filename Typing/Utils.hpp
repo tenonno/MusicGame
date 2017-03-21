@@ -148,6 +148,19 @@ Plane CreatePlane(const Vec3 &position, const Vec3 &forward, const double size)
 
 }
 
+Plane CreatePlane(const Vec3 &position, const Vec3 &forward, const double w, const double h)
+{
+
+	Plane plane(position, w, h, Quaternion(Vec3::Forward, forward));
+
+	return plane;
+
+}
+
+
+
+
+
 
 
 Plane CreatePlaneFromLine(const Vec3 &begin, const Vec3 &end, const double size)

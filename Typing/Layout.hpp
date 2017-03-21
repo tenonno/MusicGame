@@ -25,6 +25,42 @@ class Layout
 
 
 
+		JSONArray lanes_2(LANE_COUNT);
+
+		auto _index = 0;
+
+		// ƒŒ[ƒ“‚ğ®—‚·‚é
+		for (auto &lane : json_lanes)
+		{
+
+			if (lane[L"index"].isNumber())
+			{
+				lanes_2[(size_t)lane[L"index"].getNumber()] = lane;
+			}
+
+
+			if (lane[L"index"].isArray())
+			{
+				for (auto index : lane[L"index"].getArray())
+				{
+					lanes_2[(size_t)index.getNumber()] = lane;
+
+				}
+
+			}
+
+			if (lane[L"index"].isNull())
+			{
+				lanes_2[_index] = lane;
+			}
+
+			++_index;
+		}
+
+
+		json_lanes = lanes_2;
+
+
 		// JSON ‚©‚çƒŒ[ƒ“‚ÌˆÊ’uî•ñ‚ğæ“¾
 		auto _lanes = LaneParser::Parse2(json_lanes);
 
@@ -40,7 +76,7 @@ class Layout
 			auto points = LaneParser::ToPoints(lane_framePoint);
 
 
-			auto json_lane = json[L"lanes"].getArray()[index];
+			auto json_lane = json_lanes[index];
 
 
 
@@ -48,7 +84,7 @@ class Layout
 			{
 				Lane _lane(points);
 				_lane.w = json_lane[L"w"].getNumber();
-				_lane.centerPlaneOpacity = json[L"centerPlane"][L"opacity"].getNumber();
+				_lane.centerPlaneOpacity = 1.0;// json[L"centerPlane"][L"opacity"].getOr<double>(1.0);// .getNumber();
 				_lane.color = json_lane[L"color"].isNull() ? Palette::White : Color(json_lane[L"color"].getString());
 				_lane.fadeOpacity = json[L"fadeOpacity"].getOr<bool>(false) ? 1.0 : 0.0;
 				lanes[index] = _lane;
@@ -62,9 +98,23 @@ class Layout
 
 
 			_template.size = json_lane[L"w"].getNumber();
-			_template.backgroundColor = Color(json_lane[L"color"].getOr<String>(L"#fff"));
+
+			_template.noteSize = json_lane[L"noteSize"].getOr<double>(_template.size);
 
 
+
+			_template.backgroundColor = Color(json_lane[L"backgroundColor"].getOr<String>(L"#fff"));
+
+			if (!json_lane[L"backgroundOpacity"].isNull())
+			{
+				_template.backgroundColor.a = json_lane[L"backgroundOpacity"].getNumber();
+			}
+
+
+			_template.noteColor = Color(json_lane[L"noteColor"].getOr<String>(L"#0f0"));
+
+
+			_template.noteTime = json[L"note"][L"time"].getNumber();
 
 			auto forward = json_lane[L"forward"];
 			if (!forward.isNull()) _template.forward.reset(JSONArrayToVec3(forward.getArray()));

@@ -34,6 +34,11 @@ public:
 		return (m_bmsNote.time - currentTime) / aTime;
 	}
 
+	double position(const double currentTime, const double noteTime)
+	{
+		return (m_bmsNote.time - currentTime) / noteTime;
+	}
+
 
 	void update(const double currentTime)
 	{
@@ -41,12 +46,12 @@ public:
 	}
 
 
-	void draw3D(const Lane &lane, const double currentTime)
+	void draw3D(const Lane &lane, const double currentTime, const LaneTemplate &_template)
 	{
 
 
 		// Ä¶ˆÊ’u
-		const double pos = position(currentTime);
+		const double pos = position(currentTime, _template.noteTime);
 
 
 		if (pos > 1) return;
@@ -77,7 +82,7 @@ public:
 
 
 		// ‰¼
-		auto color = (ColorF)Palette::Green;
+		auto color = lane.noteColor;
 
 	
 
@@ -100,7 +105,7 @@ public:
 			forward = (end - begin).normalized();
 		}
 
-		CreatePlane(pos3D, forward, lane.w).drawForward(color);
+		CreatePlane(pos3D, forward, lane.w, lane.noteSize).drawForward(color);
 
 
 		

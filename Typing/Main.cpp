@@ -11,6 +11,48 @@
 #include <map>
 #include <array>
 
+
+
+
+
+
+
+namespace L
+{
+	double v = 30.0;
+
+	template<class T>
+	T L(const T &v1, const T &v2)
+	{
+
+		return (v1 * v + v2) / (v + 1.0);
+
+	}
+
+	void Update()
+	{
+
+		v -= 0.5;
+		v = Max(v, 1.0);
+
+	}
+
+	void Reset()
+	{
+		v = 30.0;
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
 #include "Utils.hpp"
 #include "BMS_Note.hpp"
 
@@ -36,6 +78,8 @@
 
 
 
+
+
 void Main()
 {
 
@@ -43,8 +87,6 @@ void Main()
 
 
 	FontAsset::Register(L"font1", 20, L"Consolas");
-
-
 
 
 
@@ -144,7 +186,7 @@ void Main()
 	}
 
 
-	
+
 
 	auto lookAt = layouts[activeLaneName].camera().lookat;
 	auto position = layouts[activeLaneName].camera().pos;
@@ -152,11 +194,16 @@ void Main()
 
 
 	Graphics3D::SetRasterizerState(RasterizerState(FillMode::Solid, CullMode::None));
+	Graphics3D::SetRasterizerStateForward(RasterizerState(FillMode::Solid, CullMode::None));
+
+	Graphics3D::SetAntiAliasing(AntiAliasing::High);
 
 	while (System::Update())
 	{
 
 		ClearPrint();
+
+		L::Update();
 
 
 		auto radio = gui.radioButton(L"rb1");
@@ -164,20 +211,19 @@ void Main()
 		if (radio.hasChanged || System::FrameCount() == 1)
 		{
 
-
+			L::Reset();
 
 			activeLaneName = radio.itemNames[radio.checkedItem.value()];
-
-
 
 		}
 
 		const auto layout = layouts[activeLaneName];
 
+		
 
 
-		position = (position * 30 + layout.camera().pos) / 31.0;
-		lookAt = (lookAt * 30 + layout.camera().lookat) / 31.0;
+		position = L::L(position, layout.camera().pos);
+		lookAt = L::L(lookAt, layout.camera().lookat);
 
 
 		Camera camera(position, lookAt, Vec3::Up, 45.0, 0.1);
@@ -198,8 +244,7 @@ void Main()
 		// Graphics3D::FreeCamera();
 
 
-		Println(L"Sec: ", sound.streamPosSec());
-		Println(L"LookAt: ", lookAt);
+		Println(L"time: ", sound.streamPosSec());
 
 
 		const double time = sound.streamPosSec();
@@ -214,18 +259,22 @@ void Main()
 
 
 
+		auto ___lanes = layout.lanes2();
+
 		for (auto note : notes)
 		{
 
-			// if (note.m_bmsNote.played) continue;
+			const auto index = note.index();
 
 
-			auto lane = lanes[note.index()];
+
+			auto lane = lanes[index];
 
 
-			note.draw3D(lane, time);
+			note.draw3D(lane, time, ___lanes[index]);
 
 			// note.draw(time);
+			// if (note.m_bmsNote.played) continue;
 
 			if (note.m_bmsNote.time <= time)
 			{
@@ -246,6 +295,10 @@ void Main()
 
 		Sphere(Vec3(0, 0, 0), 0.01).draw(Palette::Aqua);
 
+		/*
+		FontAsset(L"font1").drawAt(L"0, 0, 0", Graphics3D::ToScreenPos(Vec3(0, 0, 0)).xy());
+		FontAsset(L"font1").drawAt(L"0, 0, 1", Graphics3D::ToScreenPos(Vec3(0, 0, 1)).xy());
+		*/
 		/*
 
 
